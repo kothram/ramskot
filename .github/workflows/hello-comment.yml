@@ -13,15 +13,24 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: Post hello comment
+      - name: Create 3 subtasks and post task list
         uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const issue_number = context.payload.issue.number;
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number,
-              body: 'hello'
-            });
+            const issue_title = context.payload.issue.title || `Issue ${issue_number}`;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const created = [];
+            for (let i = 1; i <= 3; i++) {
+              const title = `Subtask: ${issue_title} — ${i}/3`;
+              const body = `This is subtask ${i} for issue #${issue_number}.\n\nParent: #${issue_number}`;
+              const res = await github.rest.issues.create({ owner, repo, title, body });
+              created.push(res.data);
+            }
+            const lines = ['Hello — I created the following subtasks:', ''];
+            for (const it of created) {
+              lines.push(`- [ ] ${it.title} (#${it.number}) - ${it.html_url}`);
+            }
+            await github.rest.issues.createComment({ owner, repo, issue_number, body: lines.join('\n') });
