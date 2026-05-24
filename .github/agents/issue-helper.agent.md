@@ -3,6 +3,7 @@ name: issue-helper
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
 
 safe-outputs:
   add-comment:
