@@ -68,6 +68,8 @@ jobs:
     permissions:
       actions: read
       contents: read
+    env:
+      COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
     outputs:
       body: ${{ steps.sanitized.outputs.body }}
       comment_id: ""
