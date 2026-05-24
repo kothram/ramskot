@@ -1,1 +1,5 @@
+# Enforce LF line endings for all text files
+* text eol=lf
+
+# Generated files
 .github/workflows/*.lock.yml linguist-generated=true merge=ours
