@@ -1,0 +1,59 @@
+name: Gmail MCP (lock)
+
+on:
+  workflow_call:
+    inputs:
+      to:
+        required: true
+        type: string
+      subject:
+        required: true
+        type: string
+      body:
+        required: true
+        type: string
+      from:
+        required: false
+        type: string
+
+permissions: {}
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send email via Gmail SMTP
+        env:
+          GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
+          GMAIL_SMTP_PASS: ${{ secrets.GMAIL_SMTP_PASS }}
+          INPUT_TO: ${{ inputs.to }}
+          INPUT_SUBJECT: ${{ inputs.subject }}
+          INPUT_BODY: ${{ inputs.body }}
+          INPUT_FROM: ${{ inputs.from }}
+        run: |
+          python - <<'PY'
+          import os, smtplib
+          from email.message import EmailMessage
+
+          user = os.getenv('GMAIL_SMTP_USER')
+          pwd = os.getenv('GMAIL_SMTP_PASS')
+          to = os.getenv('INPUT_TO')
+          subject = os.getenv('INPUT_SUBJECT')
+          body = os.getenv('INPUT_BODY')
+          frm = os.getenv('INPUT_FROM') or user
+
+          if not user or not pwd:
+              raise SystemExit('Missing GMAIL_SMTP_USER or GMAIL_SMTP_PASS secrets')
+
+          msg = EmailMessage()
+          msg['From'] = frm
+          msg['To'] = to
+          msg['Subject'] = subject
+          msg.set_content(body)
+
+          with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
+              s.login(user, pwd)
+              s.send_message(msg)
+
+          print('Email sent to', to)
+          PY
