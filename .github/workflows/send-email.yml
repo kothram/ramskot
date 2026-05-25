@@ -1,0 +1,25 @@
+name: Send Email via Gmail MCP
+
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: 'Recipient email'
+        required: true
+      subject:
+        description: 'Email subject'
+        required: true
+      body:
+        description: 'Email body'
+        required: true
+
+jobs:
+  send:
+    uses: ./.github/workflows/gmail-mcp.lock.yml
+    with:
+      to: ${{ github.event.inputs.to }}
+      subject: ${{ github.event.inputs.subject }}
+      body: ${{ github.event.inputs.body }}
+    secrets:
+      GMAIL_SMTP_USER: ${{ secrets.GMAIL_SMTP_USER }}
+      GMAIL_SMTP_PASS: ${{ secrets.GMAIL_SMTP_PASS }}
