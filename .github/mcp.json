@@ -7,5 +7,12 @@
         "mcp-server"
       ]
     }
+    ,
+    "gmail-mcp": {
+      "description": "Reusable Gmail MCP to send email via SMTP",
+      "workflow": ".github/workflows/gmail-mcp.lock.yml",
+      "inputs": ["to","subject","body","from"],
+      "secrets": ["GMAIL_SMTP_USER","GMAIL_SMTP_PASS"]
+    }
   }
 }
